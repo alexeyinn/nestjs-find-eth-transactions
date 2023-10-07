@@ -4,10 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EthTransactionsModule } from './modules/eth-transactions/eth-transactions.module';
 import { BlocksEntity } from './modules/eth-transactions/entities/blocks.entity';
 import { BlockTransactionsEntity } from './modules/eth-transactions/entities/block-transactions.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 console.log(process.env.POSTGRES_SYNCHRONIZE);
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',

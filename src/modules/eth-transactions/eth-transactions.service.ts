@@ -4,6 +4,7 @@ import axios from 'axios';
 import { BlocksEntity } from './entities/blocks.entity';
 import { Repository } from 'typeorm';
 import { BlockTransactionsEntity } from './entities/block-transactions.entity';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class EthTransactionsService {
@@ -29,7 +30,6 @@ export class EthTransactionsService {
       : 17582999;
 
     if (lastBlockNumberInBd < parseInt(lastEthBlockNumber.data.result, 16)) {
-      console.log('Вошки в условие');
       const blockNumberForFetch: number = lastBlockNumberInBd + 1;
 
       let transactions = [];
@@ -40,6 +40,7 @@ export class EthTransactionsService {
             16,
           )}&boolean=true`,
         );
+
         transactions = blockInfo.data.result.transactions;
       } catch (error) {
         throw new BadRequestException(
@@ -66,4 +67,13 @@ export class EthTransactionsService {
       }
     }
   }
+
+  // @Cron('55 * * * * *')
+  // async handleCronJob() {
+  //   const finishTime: number = +new Date() + 55000;
+
+  //   while (finishTime > +new Date()) {
+  //     await this.getTransactionsByBlock();
+  //   }
+  // }
 }
