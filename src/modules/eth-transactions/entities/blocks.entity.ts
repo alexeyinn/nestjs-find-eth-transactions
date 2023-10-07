@@ -13,5 +13,5 @@ export class BlocksEntity {
     () => BlockTransactionsEntity,
     (blockTransaction) => blockTransaction.block,
   )
-  blockTransaction: BlockTransactionsEntity;
+  blockTransaction: BlockTransactionsEntity[];
 }
