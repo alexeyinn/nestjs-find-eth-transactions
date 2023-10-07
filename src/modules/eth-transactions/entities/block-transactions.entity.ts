@@ -18,7 +18,7 @@ export class BlockTransactionsEntity {
   @Column()
   gasPrice: string;
 
-  @Column()
+  @Column({ nullable: true })
   maxFeePerGas: string;
 
   @Column()
@@ -39,11 +39,11 @@ export class BlockTransactionsEntity {
   @Column()
   value: string;
 
-  @Column('varchar', { array: true })
-  type: string[];
-
   @Column()
-  accessList: string;
+  type: string;
+
+  @Column('varchar', { array: true, nullable: true })
+  accessList: string[];
 
   @Column()
   chainId: string;
