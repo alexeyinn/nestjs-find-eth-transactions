@@ -17,12 +17,12 @@ export class CheckAccountsService {
       relations: ['blockTransaction'],
     });
 
-    let walletBalances = {};
+    const walletBalances = {};
 
     lastBlocks.forEach((block) => {
       block.blockTransaction.forEach((transaction) => {
         const { from, to } = transaction;
-        const value = parseInt(transaction.value, 16);
+        const value: number = parseInt(transaction.value, 16);
 
         if (from in walletBalances) {
           walletBalances[from] -= value;
@@ -37,8 +37,8 @@ export class CheckAccountsService {
       });
     });
 
-    let maxChangeWallet = null;
-    let maxChange = 0;
+    let maxChangeWallet: null | string = null;
+    let maxChange: number = 0;
 
     for (const wallet in walletBalances) {
       const change = Math.abs(walletBalances[wallet]);

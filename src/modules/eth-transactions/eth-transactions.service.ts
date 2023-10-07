@@ -20,6 +20,7 @@ export class EthTransactionsService {
       'https://api.etherscan.io/api?module=proxy&action=eth_blockNumber',
     );
 
+    // Смотрим запись для какого последнего блока есть запись в БД
     const lastBlockRecordInBd: BlocksEntity = await this.blocksRepository
       .createQueryBuilder('block')
       .select()
@@ -29,6 +30,7 @@ export class EthTransactionsService {
       ? lastBlockRecordInBd.block_number
       : 17582999;
 
+    // Если в сети есть более свежие блоки, получаем информацию по ним
     if (lastBlockNumberInBd < parseInt(lastEthBlockNumber.data.result, 16)) {
       const blockNumberForFetch: number = lastBlockNumberInBd + 1;
 
@@ -68,12 +70,14 @@ export class EthTransactionsService {
     }
   }
 
-  // @Cron('55 * * * * *')
-  // async handleCronJob() {
-  //   const finishTime: number = +new Date() + 55000;
+  @Cron('55 * * * * *')
+  async handleCronJob() {
+    console.log('Начался сбор информации по блокам');
+    // Через 55 секунд останавливаем цикл, что бы стэк не забился
+    const finishTime: number = +new Date() + 55000;
 
-  //   while (finishTime > +new Date()) {
-  //     await this.getTransactionsByBlock();
-  //   }
-  // }
+    while (finishTime > +new Date()) {
+      await this.getTransactionsByBlock();
+    }
+  }
 }
