@@ -5,6 +5,7 @@ import { EthTransactionsModule } from './modules/eth-transactions/eth-transactio
 import { BlocksEntity } from './modules/eth-transactions/entities/blocks.entity';
 import { BlockTransactionsEntity } from './modules/eth-transactions/entities/block-transactions.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CheckAccountsModule } from './modules/check-accounts/check-accounts.module';
 
 console.log(process.env.POSTGRES_SYNCHRONIZE);
 @Module({
@@ -22,6 +23,7 @@ console.log(process.env.POSTGRES_SYNCHRONIZE);
       entities: [BlockTransactionsEntity, BlocksEntity],
     }),
     EthTransactionsModule,
+    CheckAccountsModule,
   ],
   controllers: [],
   providers: [],
