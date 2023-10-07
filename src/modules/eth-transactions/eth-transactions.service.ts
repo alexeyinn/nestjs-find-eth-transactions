@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { BlocksEntity } from './entities/blocks.entity';
@@ -15,31 +15,55 @@ export class EthTransactionsService {
   ) {}
 
   async getTransactionsByBlock(): Promise<void> {
-    const blockNumberInHex: string = '10C4B98';
-
-    const {
-      data: {
-        result: { transactions },
-      },
-    } = await axios.get(
-      `https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=${blockNumberInHex}&boolean=true`,
+    const lastEthBlockNumber = await axios.get(
+      'https://api.etherscan.io/api?module=proxy&action=eth_blockNumber',
     );
 
-    const savedBlock: BlocksEntity = await this.blocksRepository.save({
-      block_number: parseInt('10C4B98', 16),
-    });
+    const lastBlockRecordInBd: BlocksEntity = await this.blocksRepository
+      .createQueryBuilder('block')
+      .select()
+      .orderBy('block.block_number', 'DESC')
+      .getOne();
+    const lastBlockNumberInBd: number = lastBlockRecordInBd?.block_number
+      ? lastBlockRecordInBd.block_number
+      : 17582999;
 
-    const preparedTransactions: BlockTransactionsEntity = transactions.map(
-      (elem) => {
-        delete elem.blockNumber;
+    if (lastBlockNumberInBd < parseInt(lastEthBlockNumber.data.result, 16)) {
+      console.log('Вошки в условие');
+      const blockNumberForFetch: number = lastBlockNumberInBd + 1;
 
-        return {
-          ...elem,
-          block: savedBlock,
-        };
-      },
-    );
+      let transactions = [];
 
-    await this.blockTransactionsRepository.save(preparedTransactions);
+      try {
+        const blockInfo = await axios.get(
+          `https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=${blockNumberForFetch.toString(
+            16,
+          )}&boolean=true`,
+        );
+        transactions = blockInfo.data.result.transactions;
+      } catch (error) {
+        throw new BadRequestException(
+          'Ошибка при получении списка транзакций в блоке: ',
+          error,
+        );
+      }
+
+      if (transactions) {
+        const savedBlock: BlocksEntity = await this.blocksRepository.save({
+          block_number: blockNumberForFetch,
+        });
+
+        const preparedTransactions = transactions.map((elem) => {
+          delete elem.blockNumber;
+
+          return {
+            ...elem,
+            block: savedBlock,
+          };
+        });
+
+        await this.blockTransactionsRepository.save(preparedTransactions);
+      }
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BlockTransactionsEntity } from './block-transactions.entity';
 
-@Entity()
+@Entity('blocks')
 export class BlocksEntity {
   @PrimaryGeneratedColumn()
   id: number;

@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BlocksEntity } from './blocks.entity';
 
-@Entity()
+@Entity('block_transactions')
 export class BlockTransactionsEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -45,7 +45,7 @@ export class BlockTransactionsEntity {
   @Column('varchar', { array: true, nullable: true })
   accessList: string[];
 
-  @Column()
+  @Column({ nullable: true })
   chainId: string;
 
   @Column()
